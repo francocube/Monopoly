@@ -14,10 +14,16 @@ int calculerChemin(t_coords tab_chemin[10], t_coords positionInitiale, t_coords 
 
     int deplacementVertical = positionFinale.numeroLigne - positionInitiale.numeroLigne; //nbre de déplacements (d'une case) verticaux
 
+    int nbreTuilesDeplacementSansObstacle = abs(deplacementHorizontal) + abs(deplacementVertical);
     //si la position finale est égale à la position initiale, pas de déplacement
     if (deplacementHorizontal == 0 && deplacementVertical == 0)
     {
         return 0;
+    }
+
+    if (nbreTuilesDeplacementSansObstacle > pm){
+           printf("\ndeplacement de %d tuiles impossible, vous depassez la pm %d", nbreTuilesDeplacementSansObstacle, pm);
+        return -1;
     }
 
     calculerPremiereTuileDuChemin(tab_chemin, positionInitiale, positionFinale);
@@ -31,15 +37,21 @@ int calculerChemin(t_coords tab_chemin[10], t_coords positionInitiale, t_coords 
 
     else
     {
-        nbreTuilesSurChemin = calculerCheminHorizontal(tab_chemin, positionInitiale, deplacementHorizontal, 0, pm);
-        if (nbreTuilesSurChemin > 0) //si nbreTuilesSurChemin vaut -1, on ne continue pas
+        nbreTuilesSurLigne = calculerCheminHorizontal(tab_chemin, positionInitiale, deplacementHorizontal, 0, pm);
+        if (nbreTuilesSurLigne > 0) //si nbreTuilesSurLigne vaut -1, on ne continue pas
         {
             t_coords positionApresDeplacementHorizontal;
             positionApresDeplacementHorizontal.numeroLigne = tab_chemin[0].numeroLigne;
             positionApresDeplacementHorizontal.numeroColonne = tab_chemin[abs(deplacementHorizontal) - 1].numeroColonne;
 
-            nbreTuilesSurChemin = nbreTuilesSurChemin +
-                                  calculerCheminVertical(tab_chemin, positionApresDeplacementHorizontal, deplacementVertical, nbreTuilesSurChemin, pm);
+            nbreTuilesSurColonne = calculerCheminVertical(tab_chemin, positionApresDeplacementHorizontal, deplacementVertical, nbreTuilesSurLigne, pm - nbreTuilesSurLigne);
+
+            if (nbreTuilesSurColonne != -1){
+            nbreTuilesSurChemin = nbreTuilesSurLigne + nbreTuilesSurColonne;
+        }
+        else {
+            nbreTuilesSurChemin = -1;
+        }
         }
 
 
@@ -73,7 +85,7 @@ int calculerCheminVertical(t_coords tab_chemin[10], t_coords positionDepart, int
 
         for (int j=indiceTabChemin ; j < indiceTabChemin + abs(deplacementVertical); j++)
         {
-            printf("\nl'indice dans tab_chemin pour deplac. vertical est %d", j);
+   //         printf("\nl'indice dans tab_chemin pour deplac. vertical est %d", j);
             //je me déplace sur la colonne, c'est le numéro de ligne qui change
             tab_chemin[j].numeroLigne = tab_chemin[j - 1].numeroLigne + deplacementVertical/abs(deplacementVertical);
             tab_chemin[j].numeroColonne = positionDepart.numeroColonne;
@@ -182,12 +194,7 @@ calculerPremiereTuileDuChemin(t_coords tab_chemin[10], t_coords positionInitiale
 
     }
 
-    printf("\n la premiere tuile est ligne %d, colonne %d", tab_chemin[0].numeroLigne, tab_chemin[0].numeroColonne);
+ //   printf("\n la premiere tuile est ligne %d, colonne %d", tab_chemin[0].numeroLigne, tab_chemin[0].numeroColonne);
 
 }
 
-//la fonction calculerChemin renvoie le nombre de tuiles du chemin
-//je me déplace d'abord sur la ligne puis sur la colonne; mais s'il y a un obstacle
-int calculerCheminAvecObstacle(t_coords tab_chemin[10], t_tuile terrain[NYMAP][NXMAP], t_coords positionInitiale, t_coords positionFinale)
-{
-}
